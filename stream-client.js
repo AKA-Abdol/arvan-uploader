@@ -1,24 +1,6 @@
-import * as fs from "fs";
 import * as tus from "tus-js-client";
 import http from "./http-client.js";
-
-function persistFail(filename) {
-  try {
-    fs.appendFile("fail.db.txt", `${filename}~`);
-    console.log("fail added to db");
-  } catch (e) {
-    console.error("cannot find db to persist fails");
-  }
-}
-
-function persistSuccess(data) {
-  try {
-    fs.appendFile("success.db.txt", `${data}~`);
-    console.log("success added to db");
-  } catch (e) {
-    console.error("cannot find db to persist successes");
-  }
-}
+import { persistFail, persistSuccess } from "./persister/index.js";
 
 async function createVideo(fileId, title) {
   return http.post(`/channels/${process.env.ARVAN_CHANNEL_ID}/videos`, {
@@ -39,7 +21,7 @@ export function upload(fileBuffer, filename, filetype) {
       headers: {
         Authorization: process.env.ARVAN_API_KEY,
       },
-      retryDelays: [0, 3000, 5000, 10000, 20000, 100000],
+      retryDelays: [0, 3_000, 5_000, 10_000, 20_000],
       metadata: {
         filename,
         filetype,
@@ -60,11 +42,13 @@ export function upload(fileBuffer, filename, filetype) {
         try {
           const res = await createVideo(getFileIdByUrl(upload.url), filename);
           persistSuccess(
-            `${filename},${getFileIdByUrl(upload.url)},${res.data.data.id}`
+            filename,
+            getFileIdByUrl(upload.url),
+            res.data.data.id
           );
           resolve();
         } catch (e) {
-          persistFail(`${filename},${getFileIdByUrl(upload.url)}`);
+          persistFail(filename, getFileIdByUrl(upload.url));
           reject();
         }
       },

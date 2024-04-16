@@ -20,6 +20,7 @@ async function main(videoFiles) {
   for (const video of videoFiles) await processFile(video);
 }
 
-const videoFiles = globSync(`/run/media/aka_abdol/93/**/*.mp4`);
+const videoFiles = globSync(`./videos/**/*.mp4`);
+console.log(videoFiles);
 main(videoFiles);
 // fs.appendFileSync('./videos.txt', videoFiles.reduce((agg, video) => `${getFilename(video)}\n${agg}`));
