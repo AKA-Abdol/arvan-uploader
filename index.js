@@ -9,9 +9,7 @@ function getFilename(path) {
 }
 
 async function processFile(fileDir) {
-  const readStream = fs.createReadStream(fileDir, {
-    highWaterMark: 1 * 1024 * 1024 * 1024,
-  });
+  const readStream = fs.createReadStream(fileDir);
   const { mime } = await fileType.fileTypeFromStream(readStream);
   await upload(readStream, getFilename(fileDir), mime);
 }
