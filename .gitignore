@@ -144,4 +144,6 @@ dist
  
 videos
 
+persister/*.db.txt
+
 # End of https://www.toptal.com/developers/gitignore/api/node
